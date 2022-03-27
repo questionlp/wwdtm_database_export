@@ -1,0 +1,7 @@
+{
+    "python.linting.pylintArgs": [
+        "--extension-pkg-whitelist=mysql"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.formatting.provider": "black",
+}
