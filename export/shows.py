@@ -144,25 +144,56 @@ class Shows:
         if results:
             return json.dumps(results, indent=2, sort_keys=False)
 
-    def panelist_map_to_json(self) -> str:
+    def panelist_map_to_json(self, include_decimal_score: bool = False) -> str:
         """Returns the contents of the ww_showpnlmap database table as a
         JSON string.
 
         :return: Contents of the ww_showpnlmap table as JSON
         """
+        query = "SHOW COLUMNS FROM ww_showpnlmap WHERE Field = 'panelistscore_decimal';"
+        cursor = self.database_connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchone()
+        cursor.close()
+
+        if result:
+            has_panelist_score_decimal = True
+        else:
+            has_panelist_score_decimal = False
+
+        if include_decimal_score and has_panelist_score_decimal:
+            query = (
+                "SELECT showpnlmapid, showid, panelistid, panelistlrndstart, "
+                "panelistlrndcorrect, panelistscore, panelistscore_decimal, "
+                "showpnlrank "
+                "FROM ww_showpnlmap "
+                "ORDER BY showpnlmapid ASC;"
+            )
+        else:
+            query = (
+                "SELECT showpnlmapid, showid, panelistid, panelistlrndstart, "
+                "panelistlrndcorrect, panelistscore, showpnlrank "
+                "FROM ww_showpnlmap "
+                "ORDER BY showpnlmapid ASC;"
+            )
         cursor = self.database_connection.cursor(dictionary=True)
-        query = (
-            "SELECT showpnlmapid, showid, panelistid, panelistlrndstart, "
-            "panelistlrndcorrect, panelistscore, showpnlrank "
-            "FROM ww_showpnlmap "
-            "ORDER BY showpnlmapid ASC;"
-        )
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            if include_decimal_score:
+                records = []
+                for row in results:
+                    if "panelistscore_decimal" in row and row["panelistscore_decimal"]:
+                        row["panelistscore_decimal"] = float(
+                            row["panelistscore_decimal"]
+                        )
+                        records.append(row)
+
+                return json.dumps(records, indent=2, sort_keys=False)
+            else:
+                return json.dumps(results, indent=2, sort_keys=False)
 
     def scorekeeper_map_to_json(self) -> str:
         """Returns the contents of the ww_showskmap database table as a

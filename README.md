@@ -46,7 +46,7 @@ optional arguments:
 ## Code of Conduct
 
 This projects follows version 2.1 of the
-[Contributor Convenant's](https://www.contributor-covenant.org/). A copy of
+[Contributor Covenant's](https://www.contributor-covenant.org/). A copy of
 the [Code of Conduct](https://github.com/questionlp/wwdtm_database_export/blob/main/CODE_OF_CONDUCT.md)
 document is included in this repository.
 
