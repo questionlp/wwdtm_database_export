@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim: set noai syntax=python ts=4 sw=4:
 #
-# Copyright (c) 2022 Linh Pham
+# Copyright (c) 2022-2023 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
 """Locations Database Export Module"""
 
@@ -43,11 +43,11 @@ class Locations:
         :return: Contents of the ww_locations table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
-        query = (
-            "SELECT locationid, city, state, venue, locationslug "
-            "FROM ww_locations "
-            "ORDER BY locationid ASC;"
-        )
+        query = """
+            SELECT locationid, city, state, venue, locationslug
+            FROM ww_locations
+            ORDER BY locationid ASC;
+            """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()

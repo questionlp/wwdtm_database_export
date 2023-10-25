@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim: set noai syntax=python ts=4 sw=4:
 #
-# Copyright (c) 2022 Linh Pham
+# Copyright (c) 2022-2023 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
 """Shows and Show Mappings Database Export Module"""
 
@@ -43,12 +43,11 @@ class Shows:
         :return: Contents of the ww_shows table as JSON
         """
         cursor = self.database_connection.cursor(named_tuple=True)
-        query = (
-            "SELECT showid, showdate, repeatshowid, bestof, "
-            "bestofuniquebluff "
-            "FROM ww_shows "
-            "ORDER BY showid ASC;"
-        )
+        query = """
+            SELECT showid, showdate, repeatshowid, bestof, bestofuniquebluff
+            FROM ww_shows
+            ORDER BY showid ASC;
+            """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
@@ -74,12 +73,11 @@ class Shows:
         :return: Contents of the ww_showbluffmap table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
-        query = (
-            "SELECT showbluffmapid, showid, chosenbluffpnlid, "
-            "correctbluffpnlid "
-            "FROM ww_showbluffmap "
-            "ORDER BY showbluffmapid ASC;"
-        )
+        query = """
+            SELECT showbluffmapid, showid, chosenbluffpnlid, correctbluffpnlid
+            FROM ww_showbluffmap
+            ORDER BY showbluffmapid ASC;
+            """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
@@ -94,11 +92,11 @@ class Shows:
         :return: Contents of the ww_showguestmap table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
-        query = (
-            "SELECT showguestmapid, showid, guestid, guestscore, exception "
-            "FROM ww_showguestmap "
-            "ORDER BY showguestmapid ASC;"
-        )
+        query = """
+            SELECT showguestmapid, showid, guestid, guestscore, exception
+            FROM ww_showguestmap
+            ORDER BY showguestmapid ASC;
+            """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
@@ -113,11 +111,11 @@ class Shows:
         :return: Contents of the ww_showhostmap table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
-        query = (
-            "SELECT showhostmapid, showid, hostid, guest "
-            "FROM ww_showhostmap "
-            "ORDER BY showhostmapid ASC;"
-        )
+        query = """
+            SELECT showhostmapid, showid, hostid, guest
+            FROM ww_showhostmap
+            ORDER BY showhostmapid ASC;
+            """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
@@ -132,11 +130,11 @@ class Shows:
         :return: Contents of the ww_showlocationmap table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
-        query = (
-            "SELECT showlocationmapid, showid, locationid "
-            "FROM ww_showlocationmap "
-            "ORDER BY showlocationmapid ASC;"
-        )
+        query = """
+            SELECT showlocationmapid, showid, locationid
+            FROM ww_showlocationmap
+            ORDER BY showlocationmapid ASC;
+            """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
@@ -150,46 +148,106 @@ class Shows:
 
         :return: Contents of the ww_showpnlmap table as JSON
         """
-        query = "SHOW COLUMNS FROM ww_showpnlmap WHERE Field = 'panelistscore_decimal';"
+        query = """
+            SHOW COLUMNS FROM ww_showpnlmap
+            WHERE Field in (
+              'panelistlrndstart_decimal', 'panelistlrndcorrect_decimal',
+              'panelistscore_decimal'
+            );
+            """
         cursor = self.database_connection.cursor()
         cursor.execute(query)
-        result = cursor.fetchone()
+        _ = cursor.fetchall()
+        row_count = cursor.rowcount
         cursor.close()
 
-        if result:
+        if row_count == 3:
+            has_all_decimal = True
+            has_panelist_score_decimal = True
+        elif row_count == 1:
+            has_all_decimal = False
             has_panelist_score_decimal = True
         else:
+            has_all_decimal = False
             has_panelist_score_decimal = False
 
-        if include_decimal_score and has_panelist_score_decimal:
-            query = (
-                "SELECT showpnlmapid, showid, panelistid, panelistlrndstart, "
-                "panelistlrndcorrect, panelistscore, panelistscore_decimal, "
-                "showpnlrank "
-                "FROM ww_showpnlmap "
-                "ORDER BY showpnlmapid ASC;"
-            )
+        if include_decimal_score and has_all_decimal:
+            query = """
+                SELECT showpnlmapid, showid, panelistid,
+                panelistlrndstart, panelistlrndstart_decimal,
+                panelistlrndcorrect, panelistlrndcorrect_decimal,
+                panelistscore, panelistscore_decimal,
+                showpnlrank
+                FROM ww_showpnlmap
+                ORDER BY showpnlmapid ASC;
+                """
+        elif include_decimal_score and has_panelist_score_decimal:
+            query = """
+                SELECT showpnlmapid, showid, panelistid, panelistlrndstart,
+                panelistlrndcorrect, panelistscore, panelistscore_decimal,
+                showpnlrank
+                FROM ww_showpnlmap
+                ORDER BY showpnlmapid ASC;
+                """
         else:
-            query = (
-                "SELECT showpnlmapid, showid, panelistid, panelistlrndstart, "
-                "panelistlrndcorrect, panelistscore, showpnlrank "
-                "FROM ww_showpnlmap "
-                "ORDER BY showpnlmapid ASC;"
-            )
+            query = """
+                SELECT showpnlmapid, showid, panelistid, panelistlrndstart,
+                panelistlrndcorrect, panelistscore, showpnlrank
+                FROM ww_showpnlmap
+                ORDER BY showpnlmapid ASC;
+                """
         cursor = self.database_connection.cursor(dictionary=True)
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
 
         if results:
-            if include_decimal_score:
+            if include_decimal_score and has_all_decimal:
                 records = []
                 for row in results:
-                    if "panelistscore_decimal" in row and row["panelistscore_decimal"]:
+                    if (
+                        "panelistlrndstart_decimal" in row
+                        and row["panelistlrndstart_decimal"] is not None
+                    ):
+                        row["panelistlrndstart_decimal"] = float(
+                            row["panelistlrndstart_decimal"]
+                        )
+
+                    if (
+                        "panelistlrndcorrect_decimal" in row
+                        and row["panelistlrndcorrect_decimal"] is not None
+                    ):
+                        row["panelistlrndcorrect_decimal"] = float(
+                            row["panelistlrndcorrect_decimal"]
+                        )
+
+                    if (
+                        "panelistscore_decimal" in row
+                        and row["panelistscore_decimal"] is not None
+                    ):
                         row["panelistscore_decimal"] = float(
                             row["panelistscore_decimal"]
                         )
-                        records.append(row)
+
+                    records.append(row)
+
+                return json.dumps(records, indent=2, sort_keys=False)
+            elif (
+                include_decimal_score
+                and not has_all_decimal
+                and has_panelist_score_decimal
+            ):
+                records = []
+                for row in results:
+                    if (
+                        "panelistscore_decimal" in row
+                        and row["panelistscore_decimal"] is not None
+                    ):
+                        row["panelistscore_decimal"] = float(
+                            row["panelistscore_decimal"]
+                        )
+
+                    records.append(row)
 
                 return json.dumps(records, indent=2, sort_keys=False)
             else:
@@ -202,11 +260,11 @@ class Shows:
         :return: Contents of the ww_showskmap table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
-        query = (
-            "SELECT showskmapid, showid, scorekeeperid, guest, description "
-            "FROM ww_showskmap "
-            "ORDER BY showskmapid ASC;"
-        )
+        query = """
+            SELECT showskmapid, showid, scorekeeperid, guest, description
+            FROM ww_showskmap
+            ORDER BY showskmapid ASC;
+            """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
