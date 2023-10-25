@@ -5,6 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: database_export.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/database_export.py",
+            "args": ["--date", "output"],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
