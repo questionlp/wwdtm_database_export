@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim: set noai syntax=python ts=4 sw=4:
 #
-# Copyright (c) 2022 Linh Pham
+# Copyright (c) 2022-2023 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
 """Hosts Database Export Module"""
 
@@ -43,11 +43,11 @@ class Hosts:
         :return: Contents of the ww_hosts table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
-        query = (
-            "SELECT hostid, host, hostgender, hostslug "
-            "FROM ww_hosts "
-            "ORDER BY hostid ASC;"
-        )
+        query = """
+            SELECT hostid, host, hostgender, hostslug
+            FROM ww_hosts
+            ORDER BY hostid ASC;
+            """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
