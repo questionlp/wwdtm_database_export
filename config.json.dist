@@ -13,6 +13,7 @@
         "time_zone": "America/Los_Angeles"
     },
     "settings": {
-        "include_panelist_decimal_score": false
+        "include_panelist_decimal_score": false,
+        "convert_decimal_to_string": false
     }
 }

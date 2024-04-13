@@ -1,7 +1,11 @@
 {
-    "python.linting.pylintArgs": [
-        "--extension-pkg-whitelist=mysql"
-    ],
-    "python.testing.pytestEnabled": false,
-    "python.formatting.provider": "black",
+    "[python]": {
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.sortImports": "explicit",
+        },
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    }
 }

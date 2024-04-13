@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
-# vim: set noai syntax=python ts=4 sw=4:
-#
-# Copyright (c) 2022-2023 Linh Pham
+# Copyright (c) 2022-2024 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
-
+# SPDX-License-Identifier: Apache-2.0
+#
+# vim: set noai syntax=python ts=4 sw=4:
+"""Wait Wait Stats Database Export."""
 import argparse
-from datetime import datetime
 import json
-from pathlib import Path
 import sys
-from typing import Any, Dict
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 from export.descriptions import Descriptions
 from export.guests import Guests
@@ -17,35 +17,39 @@ from export.hosts import Hosts
 from export.locations import Locations
 from export.notes import Notes
 from export.panelists import Panelists
+from export.pronouns import Pronouns
 from export.scorekeepers import Scorekeepers
 from export.shows import Shows
 
 
-def load_database_config() -> Dict[str, Any]:
-    """Load database connection settings from config.json and return
-    values as a dictionary.
+def load_database_config() -> dict[str, Any]:
+    """Load database connection settings from config.json.
 
     :return: A dictionary containing database connection settings for
         use with mysql.connector.
     """
-    with open("config.json", "r", encoding="utf-8") as config_file:
+    config_file_path = Path("config.json")
+    with config_file_path.open(mode="r", encoding="utf-8") as config_file:
         config_dict = json.load(config_file)
         if "database" in config_dict:
             return config_dict["database"]
 
 
-def load_settings() -> Dict[str, Any]:
-    """Load application settings from config.json and return values
-    as a dictionary.
+def load_settings() -> dict[str, Any]:
+    """Load application settings from config.json.
 
     :return: A dictionary containing application settings.
     """
-    with open("config.json", "r", encoding="utf-8") as config_file:
-        config_dict: Dict = json.load(config_file)
+    config_file_path = Path("config.json")
+    with config_file_path.open(mode="r", encoding="utf-8") as config_file:
+        config_dict: dict = json.load(config_file)
         if "settings" in config_dict:
             settings = config_dict["settings"]
             settings["include_panelist_decimal_score"] = bool(
                 settings.get("include_panelist_decimal_score", False)
+            )
+            settings["convert_decimal_to_string"] = bool(
+                settings.get("convert_decimal_to_string", False)
             )
             return settings
 
@@ -75,9 +79,8 @@ def parse_arguments():
     }
 
 
-def parse_output_directory(arguments: Dict[str, Any]) -> Path:
-    """Parser output directory based on arguments passed into the
-    program.
+def parse_output_directory(arguments: dict[str, Any]) -> Path:
+    """Parse output directory based on command arguments.
 
     :param arguments: Parsed command line arguments
     :return: Path object containing the output directory path.
@@ -106,8 +109,7 @@ def create_output_directory(output_directory: Path):
 
 
 def export_description_table(output_directory: Path):
-    """Export ww_showdescriptions table and write the generated JSON out
-    to a text file.
+    """Export ww_showdescriptions table to a JSON file.
 
     :param output_directory: Path object containing the output directory
         path.
@@ -125,8 +127,7 @@ def export_description_table(output_directory: Path):
 
 
 def export_guests_table(output_directory: Path):
-    """Export ww_guests table and write the generated JSON out to a text
-    file.
+    """Export ww_guests table to a JSON file.
 
     :param output_directory: Path object containing the output directory
         path.
@@ -144,8 +145,7 @@ def export_guests_table(output_directory: Path):
 
 
 def export_hosts_table(output_directory: Path):
-    """Export ww_hosts table and write the generated JSON out to a text
-    file.
+    """Export ww_hosts table to a JSON file.
 
     :param output_directory: Path object containing the output directory
         path.
@@ -162,15 +162,18 @@ def export_hosts_table(output_directory: Path):
         sys.exit(1)
 
 
-def export_locations_table(output_directory: Path):
-    """Export ww_locations table and write the generated JSON out to a
-    text file.
+def export_locations_table(
+    output_directory: Path, convert_decimal_to_string: bool = False
+):
+    """Export ww_locations table to a JSON file.
 
     :param output_directory: Path object containing the output directory
         path.
     """
     locations = Locations(connect_dict=database_config)
-    locations_json = locations.to_json()
+    locations_json = locations.to_json(
+        convert_decimal_to_string=convert_decimal_to_string
+    )
     locations_file_name = "ww_locations.json"
     locations_path = output_directory.joinpath(locations_file_name)
     try:
@@ -182,8 +185,7 @@ def export_locations_table(output_directory: Path):
 
 
 def export_notes_table(output_directory: Path):
-    """Export ww_shownotes table and write the generated JSON out to a
-    text file.
+    """Export ww_shownotes table to a JSON file.
 
     :param output_directory: Path object containing the output directory
         path.
@@ -201,8 +203,7 @@ def export_notes_table(output_directory: Path):
 
 
 def export_panelists_table(output_directory: Path):
-    """Export ww_panelists table and write the generated JSON out to a
-    text file.
+    """Export ww_panelists table to a JSON file.
 
     :param output_directory: Path object containing the output directory
         path.
@@ -219,9 +220,26 @@ def export_panelists_table(output_directory: Path):
         sys.exit(1)
 
 
+def export_pronouns_table(output_directory: Path):
+    """Export ww_pronouns table to a JSON file.
+
+    :param output_directory: Path object containing the output directory
+        path.
+    """
+    pronouns = Pronouns(connect_dict=database_config)
+    pronouns_json = pronouns.to_json()
+    pronouns_file_name = "ww_pronouns.json"
+    pronouns_path = output_directory.joinpath(pronouns_file_name)
+    try:
+        with pronouns_path.open("w", encoding="utf-8") as panelists_file:
+            panelists_file.write(pronouns_json)
+    except PermissionError:
+        print(f"Could not create or write to {pronouns_path}. Exiting.")
+        sys.exit(1)
+
+
 def export_scorekeepers_table(output_directory: Path):
-    """Export ww_scorekeepers table and write the generated JSON out to
-    a text file.
+    """Export ww_scorekeepers table to a JSON file.
 
     :param output_directory: Path object containing the output directory
         path.
@@ -238,10 +256,10 @@ def export_scorekeepers_table(output_directory: Path):
         sys.exit(1)
 
 
-def export_shows_tables(output_directory: Path, include_decimal_score: bool = False):
-    """Export ww_shows, ww_showbluffmap, ww_showguestmap,
-    ww_showhostmap, ww_showlocationmap, ww_showpnlmap, ww_showskmap
-    tables and write the generated JSON out to corresponding text files.
+def export_shows_tables(
+    output_directory: Path, convert_decimal_to_string: bool = False
+):
+    """Export show-related tables to corresponding JSON files.
 
     :param output_directory: Path object containing the output directory
         path.
@@ -298,7 +316,7 @@ def export_shows_tables(output_directory: Path, include_decimal_score: bool = Fa
         sys.exit(1)
 
     panelist_map_json = shows.panelist_map_to_json(
-        include_decimal_score=include_decimal_score
+        convert_decimal_to_string=convert_decimal_to_string
     )
     panelist_map_file_name = "ww_showpnlmap.json"
     panelist_map_path = output_directory.joinpath(panelist_map_file_name)
@@ -335,11 +353,15 @@ create_output_directory(output_directory=output_directory)
 export_description_table(output_directory=output_directory)
 export_guests_table(output_directory=output_directory)
 export_hosts_table(output_directory=output_directory)
-export_locations_table(output_directory=output_directory)
+export_locations_table(
+    output_directory=output_directory,
+    convert_decimal_to_string=settings_config["convert_decimal_to_string"],
+)
 export_notes_table(output_directory=output_directory)
 export_panelists_table(output_directory=output_directory)
+export_pronouns_table(output_directory=output_directory)
 export_scorekeepers_table(output_directory=output_directory)
 export_shows_tables(
     output_directory=output_directory,
-    include_decimal_score=settings_config["include_panelist_decimal_score"],
+    convert_decimal_to_string=settings_config["convert_decimal_to_string"],
 )

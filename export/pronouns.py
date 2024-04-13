@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # vim: set noai syntax=python ts=4 sw=4:
-"""Show Notes Database Export Module."""
+"""Preferred Pronouns Database Export Module."""
 import json
 from typing import Any
 
@@ -12,11 +12,11 @@ from mysql.connector.connection import MySQLConnection
 from mysql.connector.pooling import PooledMySQLConnection
 
 
-class Notes:
-    """Wait Wait Stats Database Show Notes.
+class Pronouns:
+    """Wait Wait Stats Database Preferred Pronouns.
 
-    This class contains database methods used to export show notes data
-    from a copy of the Wait Wait Stats database.
+    This class contains database methods used to export preferred
+    pronouns data from a copy of the Wait Wait Stats database.
 
     :param connect_dict: Dictionary containing database connection
         settings as required by mysql.connector.connect
@@ -40,12 +40,15 @@ class Notes:
             self.database_connection = database_connection
 
     def to_json(self) -> str:
-        """Returns database contents of ww_shownotes as JSON.
+        """Returns database contents of ww_pronouns as JSON.
 
-        :return: Contents of the ww_shownotes table as JSON
+        :return: Contents of the ww_pronouns table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
-        query = "SELECT showid, shownotes FROM ww_shownotes ORDER BY showid ASC;"
+        query = """
+            SELECT pronounsid, pronouns FROM ww_pronouns
+            ORDER BY pronounsid ASC;
+            """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()

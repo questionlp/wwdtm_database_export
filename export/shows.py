@@ -1,19 +1,23 @@
-# -*- coding: utf-8 -*-
-# vim: set noai syntax=python ts=4 sw=4:
-#
-# Copyright (c) 2022-2023 Linh Pham
+# Copyright (c) 2022-2024 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
-"""Shows and Show Mappings Database Export Module"""
+# SPDX-License-Identifier: Apache-2.0
+#
+# vim: set noai syntax=python ts=4 sw=4:
+"""Shows and Show Mappings Database Export Module."""
 
 import json
-from typing import Any, Dict, Optional
+from typing import Any
 
 from mysql.connector import connect
+from mysql.connector.connection import MySQLConnection
+from mysql.connector.pooling import PooledMySQLConnection
 
 
 class Shows:
-    """This class contains database methods used to export show and
-    show mapping data from a copy of the Wait Wait Stats database.
+    """Wait Wait Stats Database Shows and Show Mappins.
+
+    This class contains database methods used to export show and show
+    mapping data from a copy of the Wait Wait Stats database.
 
     :param connect_dict: Dictionary containing database connection
         settings as required by mysql.connector.connect
@@ -23,10 +27,10 @@ class Shows:
 
     def __init__(
         self,
-        connect_dict: Optional[Dict[str, Any]] = None,
-        database_connection: Optional[connect] = None,
+        connect_dict: dict[str, Any] | None = None,
+        database_connection: MySQLConnection | PooledMySQLConnection | None = None,
     ):
-        """Class initialization method"""
+        """Class initialization method."""
         if connect_dict:
             self.connect_dict = connect_dict
             self.database_connection = connect(**connect_dict)
@@ -37,8 +41,7 @@ class Shows:
             self.database_connection = database_connection
 
     def to_json(self) -> str:
-        """Returns the contents of the ww_shows database table as a
-        JSON string.
+        """Returns database contents of ww_shows as JSON.
 
         :return: Contents of the ww_shows table as JSON
         """
@@ -67,8 +70,7 @@ class Shows:
             return json.dumps(shows, indent=2, sort_keys=False)
 
     def bluff_map_to_json(self) -> str:
-        """Returns the contents of the ww_showbluffmap database table as
-        a JSON string.
+        """Returns database contents of ww_showbluffmap as JSON.
 
         :return: Contents of the ww_showbluffmap table as JSON
         """
@@ -86,8 +88,7 @@ class Shows:
             return json.dumps(results, indent=2, sort_keys=False)
 
     def guest_map_to_json(self) -> str:
-        """Returns the contents of the ww_showguestmap database table as
-        a JSON string.
+        """Returns database contents of ww_showguestmap as JSON.
 
         :return: Contents of the ww_showguestmap table as JSON
         """
@@ -105,8 +106,7 @@ class Shows:
             return json.dumps(results, indent=2, sort_keys=False)
 
     def host_map_to_json(self) -> str:
-        """Returns the contents of the ww_showhostmap database table as
-        a JSON string.
+        """Returns database contents of ww_showhostmap as JSON.
 
         :return: Contents of the ww_showhostmap table as JSON
         """
@@ -124,8 +124,7 @@ class Shows:
             return json.dumps(results, indent=2, sort_keys=False)
 
     def location_map_to_json(self) -> str:
-        """Returns the contents of the ww_showlocationmap database table
-        as a JSON string.
+        """Returns database contents of ww_showlocationmap as JSON.
 
         :return: Contents of the ww_showlocationmap table as JSON
         """
@@ -142,120 +141,74 @@ class Shows:
         if results:
             return json.dumps(results, indent=2, sort_keys=False)
 
-    def panelist_map_to_json(self, include_decimal_score: bool = False) -> str:
-        """Returns the contents of the ww_showpnlmap database table as a
-        JSON string.
+    def panelist_map_to_json(self, convert_decimal_to_string: bool = False) -> str:
+        """Returns database contents of ww_showpnlmap database as JSON.
 
         :return: Contents of the ww_showpnlmap table as JSON
         """
         query = """
-            SHOW COLUMNS FROM ww_showpnlmap
-            WHERE Field in (
-              'panelistlrndstart_decimal', 'panelistlrndcorrect_decimal',
-              'panelistscore_decimal'
-            );
+            SELECT showpnlmapid, showid, panelistid,
+            panelistlrndstart, panelistlrndstart_decimal,
+            panelistlrndcorrect, panelistlrndcorrect_decimal,
+            panelistscore, panelistscore_decimal, showpnlrank
+            FROM ww_showpnlmap
+            ORDER BY showpnlmapid ASC;
             """
-        cursor = self.database_connection.cursor()
-        cursor.execute(query)
-        _ = cursor.fetchall()
-        row_count = cursor.rowcount
-        cursor.close()
 
-        if row_count == 3:
-            has_all_decimal = True
-            has_panelist_score_decimal = True
-        elif row_count == 1:
-            has_all_decimal = False
-            has_panelist_score_decimal = True
-        else:
-            has_all_decimal = False
-            has_panelist_score_decimal = False
-
-        if include_decimal_score and has_all_decimal:
-            query = """
-                SELECT showpnlmapid, showid, panelistid,
-                panelistlrndstart, panelistlrndstart_decimal,
-                panelistlrndcorrect, panelistlrndcorrect_decimal,
-                panelistscore, panelistscore_decimal,
-                showpnlrank
-                FROM ww_showpnlmap
-                ORDER BY showpnlmapid ASC;
-                """
-        elif include_decimal_score and has_panelist_score_decimal:
-            query = """
-                SELECT showpnlmapid, showid, panelistid, panelistlrndstart,
-                panelistlrndcorrect, panelistscore, panelistscore_decimal,
-                showpnlrank
-                FROM ww_showpnlmap
-                ORDER BY showpnlmapid ASC;
-                """
-        else:
-            query = """
-                SELECT showpnlmapid, showid, panelistid, panelistlrndstart,
-                panelistlrndcorrect, panelistscore, showpnlrank
-                FROM ww_showpnlmap
-                ORDER BY showpnlmapid ASC;
-                """
-        cursor = self.database_connection.cursor(dictionary=True)
+        cursor = self.database_connection.cursor(named_tuple=True)
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
 
         if results:
-            if include_decimal_score and has_all_decimal:
-                records = []
-                for row in results:
-                    if (
-                        "panelistlrndstart_decimal" in row
-                        and row["panelistlrndstart_decimal"] is not None
-                    ):
-                        row["panelistlrndstart_decimal"] = float(
-                            row["panelistlrndstart_decimal"]
-                        )
+            shows = []
+            for row in results:
+                if row.panelistlrndstart_decimal:
+                    panelistlrndstart_decimal = (
+                        str(row.panelistlrndstart_decimal)
+                        if convert_decimal_to_string
+                        else float(row.panelistlrndstart_decimal)
+                    )
+                else:
+                    panelistlrndstart_decimal = None
 
-                    if (
-                        "panelistlrndcorrect_decimal" in row
-                        and row["panelistlrndcorrect_decimal"] is not None
-                    ):
-                        row["panelistlrndcorrect_decimal"] = float(
-                            row["panelistlrndcorrect_decimal"]
-                        )
+                if row.panelistlrndcorrect_decimal:
+                    panelistlrndcorrect_decimal = (
+                        str(row.panelistlrndcorrect_decimal)
+                        if convert_decimal_to_string
+                        else float(row.panelistlrndcorrect_decimal)
+                    )
+                else:
+                    panelistlrndcorrect_decimal = None
 
-                    if (
-                        "panelistscore_decimal" in row
-                        and row["panelistscore_decimal"] is not None
-                    ):
-                        row["panelistscore_decimal"] = float(
-                            row["panelistscore_decimal"]
-                        )
+                if row.panelistscore_decimal:
+                    panelistscore_decimal: str | float = (
+                        str(row.panelistscore_decimal)
+                        if convert_decimal_to_string
+                        else float(row.panelistscore_decimal)
+                    )
+                else:
+                    panelistscore_decimal = None
 
-                    records.append(row)
+                shows.append(
+                    {
+                        "showpnlmapid": row.showpnlmapid,
+                        "showid": row.showid,
+                        "panelistid": row.panelistid,
+                        "panelistlrndstart": row.panelistlrndstart,
+                        "panelistlrndstart_decimal": panelistlrndstart_decimal,
+                        "panelistlrndcorrect": row.panelistlrndcorrect,
+                        "panelistlrndcorrect_decimal": panelistlrndcorrect_decimal,
+                        "panelistscore": row.panelistscore,
+                        "panelistscore_decimal": panelistscore_decimal,
+                        "showpnlrank": row.showpnlrank,
+                    }
+                )
 
-                return json.dumps(records, indent=2, sort_keys=False)
-            elif (
-                include_decimal_score
-                and not has_all_decimal
-                and has_panelist_score_decimal
-            ):
-                records = []
-                for row in results:
-                    if (
-                        "panelistscore_decimal" in row
-                        and row["panelistscore_decimal"] is not None
-                    ):
-                        row["panelistscore_decimal"] = float(
-                            row["panelistscore_decimal"]
-                        )
-
-                    records.append(row)
-
-                return json.dumps(records, indent=2, sort_keys=False)
-            else:
-                return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(shows, indent=2, sort_keys=False)
 
     def scorekeeper_map_to_json(self) -> str:
-        """Returns the contents of the ww_showskmap database table as a
-        JSON string.
+        """Returns database contents of ww_showskmap as JSON.
 
         :return: Contents of the ww_showskmap table as JSON
         """
