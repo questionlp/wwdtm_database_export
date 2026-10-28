@@ -1,9 +1,9 @@
-# Copyright (c) 2022-2024 Linh Pham
+# Copyright (c) 2022-2026 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
 # SPDX-License-Identifier: Apache-2.0
 #
 # vim: set noai syntax=python ts=4 sw=4:
-"""Shows and Show Mappings Database Export Module."""
+"""Shows and Mapping Tables Export Module."""
 
 import json
 from typing import Any
@@ -45,7 +45,7 @@ class Shows:
 
         :return: Contents of the ww_shows table as JSON
         """
-        cursor = self.database_connection.cursor(named_tuple=True)
+        cursor = self.database_connection.cursor(dictionary=True)
         query = """
             SELECT showid, showdate, repeatshowid, bestof, bestofuniquebluff
             FROM ww_shows
@@ -59,15 +59,15 @@ class Shows:
             shows = []
             for show in results:
                 info = {
-                    "showid": show.showid,
-                    "showdate": show.showdate.isoformat(),
-                    "repeatshowid": show.repeatshowid,
-                    "bestof": show.bestof,
-                    "bestofuniquebluff": show.bestofuniquebluff,
+                    "showid": show["showid"],
+                    "showdate": show["showdate"].isoformat(),
+                    "repeatshowid": show["repeatshowid"],
+                    "bestof": show["bestof"],
+                    "bestofuniquebluff": show["bestofuniquebluff"],
                 }
                 shows.append(info)
 
-            return json.dumps(shows, indent=2, sort_keys=False)
+            return json.dumps(shows, indent=4, sort_keys=False)
 
     def bluff_map_to_json(self) -> str:
         """Returns database contents of ww_showbluffmap as JSON.
@@ -85,7 +85,7 @@ class Shows:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(results, indent=4, sort_keys=False)
 
     def guest_map_to_json(self) -> str:
         """Returns database contents of ww_showguestmap as JSON.
@@ -103,7 +103,7 @@ class Shows:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(results, indent=4, sort_keys=False)
 
     def host_map_to_json(self) -> str:
         """Returns database contents of ww_showhostmap as JSON.
@@ -121,7 +121,7 @@ class Shows:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(results, indent=4, sort_keys=False)
 
     def location_map_to_json(self) -> str:
         """Returns database contents of ww_showlocationmap as JSON.
@@ -139,12 +139,14 @@ class Shows:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(results, indent=4, sort_keys=False)
 
-    def panelist_map_to_json(self, convert_decimal_to_string: bool = False) -> str:
+    def panelist_map_to_json(self, convert_decimal_to_string: bool = True) -> str:
         """Returns database contents of ww_showpnlmap database as JSON.
 
         :return: Contents of the ww_showpnlmap table as JSON
+        :param convert_decimal_to_string: Convert decimal values to a
+            string instead of a floating point value.
         """
         query = """
             SELECT showpnlmapid, showid, panelistid,
@@ -155,7 +157,7 @@ class Shows:
             ORDER BY showpnlmapid ASC;
             """
 
-        cursor = self.database_connection.cursor(named_tuple=True)
+        cursor = self.database_connection.cursor(dictionary=True)
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
@@ -163,49 +165,49 @@ class Shows:
         if results:
             shows = []
             for row in results:
-                if row.panelistlrndstart_decimal:
+                if row["panelistlrndstart_decimal"]:
                     panelistlrndstart_decimal = (
-                        str(row.panelistlrndstart_decimal)
+                        str(row["panelistlrndstart_decimal"])
                         if convert_decimal_to_string
-                        else float(row.panelistlrndstart_decimal)
+                        else float(row["panelistlrndstart_decimal"])
                     )
                 else:
                     panelistlrndstart_decimal = None
 
-                if row.panelistlrndcorrect_decimal:
+                if row["panelistlrndcorrect_decimal"]:
                     panelistlrndcorrect_decimal = (
-                        str(row.panelistlrndcorrect_decimal)
+                        str(row["panelistlrndcorrect_decimal"])
                         if convert_decimal_to_string
-                        else float(row.panelistlrndcorrect_decimal)
+                        else float(row["panelistlrndcorrect_decimal"])
                     )
                 else:
                     panelistlrndcorrect_decimal = None
 
-                if row.panelistscore_decimal:
+                if row["panelistscore_decimal"]:
                     panelistscore_decimal: str | float = (
-                        str(row.panelistscore_decimal)
+                        str(row["panelistscore_decimal"])
                         if convert_decimal_to_string
-                        else float(row.panelistscore_decimal)
+                        else float(row["panelistscore_decimal"])
                     )
                 else:
                     panelistscore_decimal = None
 
                 shows.append(
                     {
-                        "showpnlmapid": row.showpnlmapid,
-                        "showid": row.showid,
-                        "panelistid": row.panelistid,
-                        "panelistlrndstart": row.panelistlrndstart,
+                        "showpnlmapid": row["showpnlmapid"],
+                        "showid": row["showid"],
+                        "panelistid": row["panelistid"],
+                        "panelistlrndstart": row["panelistlrndstart"],
                         "panelistlrndstart_decimal": panelistlrndstart_decimal,
-                        "panelistlrndcorrect": row.panelistlrndcorrect,
+                        "panelistlrndcorrect": row["panelistlrndcorrect"],
                         "panelistlrndcorrect_decimal": panelistlrndcorrect_decimal,
-                        "panelistscore": row.panelistscore,
+                        "panelistscore": row["panelistscore"],
                         "panelistscore_decimal": panelistscore_decimal,
-                        "showpnlrank": row.showpnlrank,
+                        "showpnlrank": row["showpnlrank"],
                     }
                 )
 
-            return json.dumps(shows, indent=2, sort_keys=False)
+            return json.dumps(shows, indent=4, sort_keys=False)
 
     def scorekeeper_map_to_json(self) -> str:
         """Returns database contents of ww_showskmap as JSON.
@@ -223,4 +225,4 @@ class Shows:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(results, indent=4, sort_keys=False)

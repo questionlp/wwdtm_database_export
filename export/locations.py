@@ -1,9 +1,10 @@
-# Copyright (c) 2022-2024 Linh Pham
+# Copyright (c) 2022-2026 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
 # SPDX-License-Identifier: Apache-2.0
 #
 # vim: set noai syntax=python ts=4 sw=4:
-"""Locations Database Export Module."""
+"""Locations Table Export Module."""
+
 import json
 from typing import Any
 
@@ -39,12 +40,14 @@ class Locations:
 
             self.database_connection = database_connection
 
-    def to_json(self, convert_decimal_to_string: bool = False) -> str:
+    def to_json(self, convert_decimal_to_string: bool = True) -> str:
         """Returns database contents of ww_locations as JSON.
 
         :return: Contents of the ww_locations table as JSON
+        :param convert_decimal_to_string: Convert decimal values to a
+            string instead of a floating point value.
         """
-        cursor = self.database_connection.cursor(named_tuple=True)
+        cursor = self.database_connection.cursor(dictionary=True)
         query = """
             SELECT locationid, city, state, venue, latitude, longitude,
             locationslug
@@ -58,33 +61,33 @@ class Locations:
         locations = []
         if results:
             for row in results:
-                if row.latitude:
+                if row["latitude"]:
                     latitude = (
-                        str(row.latitude)
+                        str(row["latitude"])
                         if convert_decimal_to_string
-                        else float(row.latitude)
+                        else float(row["latitude"])
                     )
                 else:
                     latitude = None
 
-                if row.longitude:
+                if row["longitude"]:
                     longitude = (
-                        str(row.longitude)
+                        str(row["longitude"])
                         if convert_decimal_to_string
-                        else float(row.longitude)
+                        else float(row["longitude"])
                     )
                 else:
                     longitude = None
 
                 locations.append(
                     {
-                        "locationid": row.locationid,
-                        "city": row.city,
-                        "state": row.venue,
+                        "locationid": row["locationid"],
+                        "city": row["city"],
+                        "state": row["venue"],
                         "latitude": latitude,
                         "longitude": longitude,
-                        "locationslug": row.locationslug,
+                        "locationslug": row["locationslug"],
                     }
                 )
 
-        return json.dumps(locations, indent=2, sort_keys=False)
+        return json.dumps(locations, indent=4, sort_keys=False)

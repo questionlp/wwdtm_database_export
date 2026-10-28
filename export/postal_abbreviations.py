@@ -1,9 +1,10 @@
-# Copyright (c) 2022-2024 Linh Pham
+# Copyright (c) 2022-2026 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
 # SPDX-License-Identifier: Apache-2.0
 #
 # vim: set noai syntax=python ts=4 sw=4:
-"""Show Notes Database Export Module."""
+"""Postal Abbreviations Table Export Module."""
+
 import json
 from typing import Any
 
@@ -12,11 +13,11 @@ from mysql.connector.connection import MySQLConnection
 from mysql.connector.pooling import PooledMySQLConnection
 
 
-class Notes:
-    """Wait Wait Stats Database Show Notes.
+class PostalAbbreviations:
+    """Wait Wait Stats Database Postal Abbreviations.
 
-    This class contains database methods used to export show notes data
-    from a copy of the Wait Wait Stats database.
+    This class contains database methods used to export postal
+    abbreviations data from a copy of the Wait Wait Stats database.
 
     :param connect_dict: Dictionary containing database connection
         settings as required by mysql.connector.connect
@@ -40,15 +41,19 @@ class Notes:
             self.database_connection = database_connection
 
     def to_json(self) -> str:
-        """Returns database contents of ww_shownotes as JSON.
+        """Returns database contents of ww_postal_abbreviations as JSON.
 
-        :return: Contents of the ww_shownotes table as JSON
+        :return: Contents of the ww_postal_abbreviations table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
-        query = "SELECT showid, shownotes FROM ww_shownotes ORDER BY showid ASC;"
+        query = """
+            SELECT postal_abbreviation, name, country
+            FROM ww_postal_abbreviations
+            ORDER BY postal_abbreviation ASC;
+            """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(results, indent=4, sort_keys=False)

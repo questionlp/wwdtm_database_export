@@ -10,7 +10,8 @@ config.json
 .DS_Store
 
 # Ignore output directory
-output/
+output/*
+!output/.gitkeep
 
 # Created by https://www.toptal.com/developers/gitignore/api/python
 # Edit at https://www.toptal.com/developers/gitignore?templates=python
