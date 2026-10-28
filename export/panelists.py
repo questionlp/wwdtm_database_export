@@ -1,9 +1,10 @@
-# Copyright (c) 2022-2024 Linh Pham
+# Copyright (c) 2022-2026 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
 # SPDX-License-Identifier: Apache-2.0
 #
 # vim: set noai syntax=python ts=4 sw=4:
-"""Panelists Database Export Module."""
+"""Panelists Tables Export Module."""
+
 import json
 from typing import Any
 
@@ -46,7 +47,7 @@ class Panelists:
         """
         cursor = self.database_connection.cursor(dictionary=True)
         query = """
-            SELECT panelistid, panelist, panelistgender, panelistpronouns,
+            SELECT panelistid, panelist, panelistgender, panelistslug,
             panelistslug
             FROM ww_panelists
             ORDER BY panelistid ASC;
@@ -56,4 +57,58 @@ class Panelists:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(results, indent=4, sort_keys=False)
+
+    def external_sites_map_to_json(self) -> str:
+        """Returns database contents of ww_panelistextsitesmap as JSON.
+
+        :return: Contents of ww_panelistextsitesmap as JSON
+        """
+        cursor = self.database_connection.cursor(dictionary=True)
+        query = """
+            SELECT panelistextsitesmapid, panelistid, siteid, url, account
+            FROM ww_panelistextsitesmap
+            ORDER BY panelistextsitesmapid ASC;
+            """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+
+        if results:
+            return json.dumps(results, indent=4, sort_keys=False)
+
+    def pronouns_map_to_json(self) -> str:
+        """Returns database contents of ww_panelistpronounsmap as JSON.
+
+        :return: Contents of ww_panelistpronounsmap as JSON
+        """
+        cursor = self.database_connection.cursor(dictionary=True)
+        query = """
+            SELECT panelistpronounsmapid, panelistid, pronounsid
+            FROM ww_panelistpronounsmap
+            ORDER BY panelistpronounsmapid ASC;
+            """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+
+        if results:
+            return json.dumps(results, indent=4, sort_keys=False)
+
+    def social_media_accounts_map_to_json(self) -> str:
+        """Returns database contents of ww_panelistsocialmap as JSON.
+
+        :return: Contents of ww_panelistsocialmap as JSON
+        """
+        cursor = self.database_connection.cursor(dictionary=True)
+        query = """
+            SELECT panelistsocialmapid, panelistid, networkid, account, url
+            FROM ww_panelistsocialmap
+            ORDER BY panelistsocialmapid ASC;
+            """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+
+        if results:
+            return json.dumps(results, indent=4, sort_keys=False)

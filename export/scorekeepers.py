@@ -1,9 +1,9 @@
-# Copyright (c) 2022-2024 Linh Pham
+# Copyright (c) 2022-2026 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
 # SPDX-License-Identifier: Apache-2.0
 #
 # vim: set noai syntax=python ts=4 sw=4:
-"""Scorekeepers Database Export Module."""
+"""Scorekeepers Tables Export Module."""
 
 import json
 from typing import Any
@@ -47,8 +47,7 @@ class Scorekeepers:
         """
         cursor = self.database_connection.cursor(dictionary=True)
         query = """
-            SELECT scorekeeperid, scorekeeper, scorekeepergender,
-            scorekeeperpronouns, scorekeeperslug
+            SELECT scorekeeperid, scorekeeper, scorekeepergender, scorekeeperslug
             FROM ww_scorekeepers
             ORDER BY scorekeeperid ASC;
             """
@@ -57,4 +56,58 @@ class Scorekeepers:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(results, indent=4, sort_keys=False)
+
+    def external_sites_map_to_json(self) -> str:
+        """Returns database contents of ww_skextsitesmap as JSON.
+
+        :return: Contents of ww_skextsitesmap as JSON
+        """
+        cursor = self.database_connection.cursor(dictionary=True)
+        query = """
+            SELECT skextsitesmapid, scorekeeperid, siteid, url, account
+            FROM ww_skextsitesmap
+            ORDER BY skextsitesmapid ASC;
+            """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+
+        if results:
+            return json.dumps(results, indent=4, sort_keys=False)
+
+    def pronouns_map_to_json(self) -> str:
+        """Returns database contents of ww_skpronounsmap as JSON.
+
+        :return: Contents of ww_skpronounsmap as JSON
+        """
+        cursor = self.database_connection.cursor(dictionary=True)
+        query = """
+            SELECT skpronounsmapid, scorekeeperid, pronounsid
+            FROM ww_skpronounsmap
+            ORDER BY skpronounsmapid ASC;
+            """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+
+        if results:
+            return json.dumps(results, indent=4, sort_keys=False)
+
+    def social_media_accounts_map_to_json(self) -> str:
+        """Returns database contents of ww_sksocialmap as JSON.
+
+        :return: Contents of ww_sksocialmap as JSON
+        """
+        cursor = self.database_connection.cursor(dictionary=True)
+        query = """
+            SELECT sksocialmapid, scorekeeperid, networkid, account, url
+            FROM ww_sksocialmap
+            ORDER BY sksocialmapid ASC;
+            """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+
+        if results:
+            return json.dumps(results, indent=4, sort_keys=False)

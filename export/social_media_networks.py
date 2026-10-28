@@ -1,9 +1,10 @@
-# Copyright (c) 2022-2024 Linh Pham
+# Copyright (c) 2022-2026 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
 # SPDX-License-Identifier: Apache-2.0
 #
 # vim: set noai syntax=python ts=4 sw=4:
-"""Show Description Database Export Module."""
+"""Social Media Networks Table Export Module."""
+
 import json
 from typing import Any
 
@@ -12,11 +13,11 @@ from mysql.connector.connection import MySQLConnection
 from mysql.connector.pooling import PooledMySQLConnection
 
 
-class Descriptions:
-    """Wait Wait Stats Database Show Descriptions.
+class SocialMediaNetworks:
+    """Wait Wait Stats Database Social Media Networks.
 
-    This class contains database methods used to export show
-    descriptions data from a copy of the Wait Wait Stats database.
+    This class contains database methods used to export social media
+    networks data from a copy of the Wait Wait Stats database.
 
     :param connect_dict: Dictionary containing database connection
         settings as required by mysql.connector.connect
@@ -40,19 +41,19 @@ class Descriptions:
             self.database_connection = database_connection
 
     def to_json(self) -> str:
-        """Returns database contents of ww_showdescriptions as JSON.
+        """Returns database contents of ww_socialmedianetworks as JSON.
 
-        :return: Contents of the ww_showdescriptions table as JSON
+        :return: Contents of the ww_socialmedianetworks table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
         query = """
-            SELECT showid, showdescription
-            FROM ww_showdescriptions
-            ORDER BY showid ASC;
+            SELECT networkid, network, networkslug
+            FROM ww_socialmedianetworks
+            ORDER BY networkid ASC;
             """
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(results, indent=4, sort_keys=False)

@@ -1,9 +1,10 @@
-# Copyright (c) 2022-2024 Linh Pham
+# Copyright (c) 2022-2026 Linh Pham
 # wwdtm_database_export is released under the terms of the Apache License 2.0
 # SPDX-License-Identifier: Apache-2.0
 #
 # vim: set noai syntax=python ts=4 sw=4:
-"""Hosts Database Export Module."""
+"""Hosts Tables Export Module."""
+
 import json
 from typing import Any
 
@@ -46,7 +47,7 @@ class Hosts:
         """
         cursor = self.database_connection.cursor(dictionary=True)
         query = """
-            SELECT hostid, host, hostgender, hostpronouns, hostslug
+            SELECT hostid, host, hostgender, hostslug
             FROM ww_hosts
             ORDER BY hostid ASC;
             """
@@ -55,4 +56,58 @@ class Hosts:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=2, sort_keys=False)
+            return json.dumps(results, indent=4, sort_keys=False)
+
+    def external_sites_map_to_json(self) -> str:
+        """Returns database contents of ww_hostextsitesmap as JSON.
+
+        :return: Contents of ww_hostextsitesmap as JSON
+        """
+        cursor = self.database_connection.cursor(dictionary=True)
+        query = """
+            SELECT hostextsitesmapid, hostid, siteid, url, account
+            FROM ww_hostextsitesmap
+            ORDER BY hostextsitesmapid ASC;
+            """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+
+        if results:
+            return json.dumps(results, indent=4, sort_keys=False)
+
+    def pronouns_map_to_json(self) -> str:
+        """Returns database contents of ww_hostpronounsmap as JSON.
+
+        :return: Contents of ww_hostpronounsmap as JSON
+        """
+        cursor = self.database_connection.cursor(dictionary=True)
+        query = """
+            SELECT hostpronounsmapid, hostid, pronounsid
+            FROM ww_hostpronounsmap
+            ORDER BY hostpronounsmapid ASC;
+            """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+
+        if results:
+            return json.dumps(results, indent=4, sort_keys=False)
+
+    def social_media_accounts_map_to_json(self) -> str:
+        """Returns database contents of ww_hostsocialmap as JSON.
+
+        :return: Contents of ww_hostsocialmap as JSON
+        """
+        cursor = self.database_connection.cursor(dictionary=True)
+        query = """
+            SELECT hostsocialmapid, hostid, networkid, account, url
+            FROM ww_hostsocialmap
+            ORDER BY hostsocialmapid ASC;
+            """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+
+        if results:
+            return json.dumps(results, indent=4, sort_keys=False)
