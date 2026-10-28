@@ -40,7 +40,7 @@ class Hosts:
 
             self.database_connection = database_connection
 
-    def to_json(self) -> str:
+    def to_json(self) -> str | None:
         """Returns database contents of ww_hosts as JSON.
 
         :return: Contents of the ww_hosts table as JSON
@@ -58,7 +58,7 @@ class Hosts:
         if results:
             return json.dumps(results, indent=4, sort_keys=False)
 
-    def external_sites_map_to_json(self) -> str:
+    def external_sites_map_to_json(self) -> str | None:
         """Returns database contents of ww_hostextsitesmap as JSON.
 
         :return: Contents of ww_hostextsitesmap as JSON
@@ -76,7 +76,7 @@ class Hosts:
         if results:
             return json.dumps(results, indent=4, sort_keys=False)
 
-    def pronouns_map_to_json(self) -> str:
+    def pronouns_map_to_json(self) -> str | None:
         """Returns database contents of ww_hostpronounsmap as JSON.
 
         :return: Contents of ww_hostpronounsmap as JSON
@@ -94,7 +94,7 @@ class Hosts:
         if results:
             return json.dumps(results, indent=4, sort_keys=False)
 
-    def social_media_accounts_map_to_json(self) -> str:
+    def social_media_accounts_map_to_json(self) -> str | None:
         """Returns database contents of ww_hostsocialmap as JSON.
 
         :return: Contents of ww_hostsocialmap as JSON

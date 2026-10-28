@@ -40,7 +40,7 @@ class Shows:
 
             self.database_connection = database_connection
 
-    def to_json(self) -> str:
+    def to_json(self) -> str | None:
         """Returns database contents of ww_shows as JSON.
 
         :return: Contents of the ww_shows table as JSON
@@ -69,7 +69,7 @@ class Shows:
 
             return json.dumps(shows, indent=4, sort_keys=False)
 
-    def bluff_map_to_json(self) -> str:
+    def bluff_map_to_json(self) -> str | None:
         """Returns database contents of ww_showbluffmap as JSON.
 
         :return: Contents of the ww_showbluffmap table as JSON
@@ -87,7 +87,7 @@ class Shows:
         if results:
             return json.dumps(results, indent=4, sort_keys=False)
 
-    def guest_map_to_json(self) -> str:
+    def guest_map_to_json(self) -> str | None:
         """Returns database contents of ww_showguestmap as JSON.
 
         :return: Contents of the ww_showguestmap table as JSON
@@ -105,7 +105,7 @@ class Shows:
         if results:
             return json.dumps(results, indent=4, sort_keys=False)
 
-    def host_map_to_json(self) -> str:
+    def host_map_to_json(self) -> str | None:
         """Returns database contents of ww_showhostmap as JSON.
 
         :return: Contents of the ww_showhostmap table as JSON
@@ -121,9 +121,20 @@ class Shows:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=4, sort_keys=False)
+            info = []
+            for row in results:
+                info.append(
+                    {
+                        "showhostmapid": row["showhostmapid"],
+                        "showid": row["showid"],
+                        "hostid": row["hostid"],
+                        "guest": bool(row["guest"]),
+                    }
+                )
 
-    def location_map_to_json(self) -> str:
+            return json.dumps(info, indent=4, sort_keys=False)
+
+    def location_map_to_json(self) -> str | None:
         """Returns database contents of ww_showlocationmap as JSON.
 
         :return: Contents of the ww_showlocationmap table as JSON
@@ -141,7 +152,9 @@ class Shows:
         if results:
             return json.dumps(results, indent=4, sort_keys=False)
 
-    def panelist_map_to_json(self, convert_decimal_to_string: bool = True) -> str:
+    def panelist_map_to_json(
+        self, convert_decimal_to_string: bool = True
+    ) -> str | None:
         """Returns database contents of ww_showpnlmap database as JSON.
 
         :return: Contents of the ww_showpnlmap table as JSON
@@ -209,7 +222,7 @@ class Shows:
 
             return json.dumps(shows, indent=4, sort_keys=False)
 
-    def scorekeeper_map_to_json(self) -> str:
+    def scorekeeper_map_to_json(self) -> str | None:
         """Returns database contents of ww_showskmap as JSON.
 
         :return: Contents of the ww_showskmap table as JSON
@@ -225,4 +238,16 @@ class Shows:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=4, sort_keys=False)
+            info = []
+            for row in results:
+                info.append(
+                    {
+                        "showskmapid": row["showskmapid"],
+                        "showid": row["showid"],
+                        "scorekeeperid": row["scorekeeperid"],
+                        "guest": bool(row["guest"]),
+                        "description": row["description"],
+                    }
+                )
+
+            return json.dumps(info, indent=4, sort_keys=False)

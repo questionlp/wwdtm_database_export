@@ -40,7 +40,7 @@ class Metadata:
 
             self.database_connection = database_connection
 
-    def to_json(self) -> str:
+    def to_json(self) -> str | None:
         """Returns database contents of __metadata as JSON.
 
         :return: Contents of the __metadata table as JSON

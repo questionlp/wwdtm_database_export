@@ -56,7 +56,7 @@ def load_settings() -> dict[str, Any]:
             return settings
 
 
-def parse_arguments():
+def parse_arguments() -> dict[str, Any]:
     """Parse arguments that are passed in when the program was run."""
     parser = argparse.ArgumentParser(
         description=("Export Wait Wait Stats database tables in JSON format.")
@@ -96,7 +96,7 @@ def parse_output_directory(arguments: dict[str, Any]) -> Path:
     return path
 
 
-def create_output_directory(output_directory: Path):
+def create_output_directory(output_directory: Path) -> None:
     """Attempt to create the output directory, if it doesn't exist.
 
     :param output_directory: Path object containing the output directory
@@ -110,7 +110,7 @@ def create_output_directory(output_directory: Path):
             sys.exit(1)
 
 
-def export_external_sites_table(output_directory: Path):
+def export_external_sites_table(output_directory: Path) -> None:
     """Export ww_external_sites table to a JSON file.
 
     :param output_directory: Path object containing the output directory
@@ -128,7 +128,7 @@ def export_external_sites_table(output_directory: Path):
         sys.exit(1)
 
 
-def export_guests_table(output_directory: Path):
+def export_guests_table(output_directory: Path) -> None:
     """Export ww_guests table to a JSON file.
 
     :param output_directory: Path object containing the output directory
@@ -146,7 +146,7 @@ def export_guests_table(output_directory: Path):
         sys.exit(1)
 
 
-def export_hosts_table(output_directory: Path):
+def export_hosts_table(output_directory: Path) -> None:
     """Export host-related tables to a JSON file.
 
     :param output_directory: Path object containing the output directory
@@ -204,7 +204,7 @@ def export_hosts_table(output_directory: Path):
 
 def export_locations_table(
     output_directory: Path, convert_decimal_to_string: bool = True
-):
+) -> None:
     """Export ww_locations table to a JSON file.
 
     :param output_directory: Path object containing the output directory
@@ -226,7 +226,7 @@ def export_locations_table(
         sys.exit(1)
 
 
-def export_metadata_table(output_directory: Path):
+def export_metadata_table(output_directory: Path) -> None:
     """Export __metadata table to a JSON file.
 
     :param output_directory: Path object containing the output directory
@@ -244,7 +244,7 @@ def export_metadata_table(output_directory: Path):
         sys.exit(1)
 
 
-def export_panelists_table(output_directory: Path):
+def export_panelists_table(output_directory: Path) -> None:
     """Export panelist-related tables to a JSON file.
 
     :param output_directory: Path object containing the output directory
@@ -306,7 +306,7 @@ def export_panelists_table(output_directory: Path):
         sys.exit(1)
 
 
-def export_postal_abbreviations_table(output_directory: Path):
+def export_postal_abbreviations_table(output_directory: Path) -> None:
     """Export ww_postal_abbreviations table to a JSON file.
 
     :param output_directory: Path object containing the output directory
@@ -346,7 +346,7 @@ def export_pronouns_table(output_directory: Path):
         sys.exit(1)
 
 
-def export_scorekeepers_table(output_directory: Path):
+def export_scorekeepers_table(output_directory: Path) -> None:
     """Export scorekeeper-related tables to a JSON file.
 
     :param output_directory: Path object containing the output directory
@@ -414,7 +414,7 @@ def export_scorekeepers_table(output_directory: Path):
         sys.exit(1)
 
 
-def export_show_descriptions_table(output_directory: Path):
+def export_show_descriptions_table(output_directory: Path) -> None:
     """Export ww_showdescriptions table to a JSON file.
 
     :param output_directory: Path object containing the output directory
@@ -450,7 +450,9 @@ def export_show_notes_table(output_directory: Path):
         sys.exit(1)
 
 
-def export_shows_tables(output_directory: Path, convert_decimal_to_string: bool = True):
+def export_shows_tables(
+    output_directory: Path, convert_decimal_to_string: bool = True
+) -> None:
     """Export show-related tables to corresponding JSON files.
 
     :param output_directory: Path object containing the output directory
@@ -532,7 +534,7 @@ def export_shows_tables(output_directory: Path, convert_decimal_to_string: bool 
         sys.exit(1)
 
 
-def export_social_media_networks_table(output_directory: Path):
+def export_social_media_networks_table(output_directory: Path) -> None:
     """Export ww_socialmedianetworks table to a JSON file.
 
     :param output_directory: Path object containing the output directory
@@ -555,12 +557,12 @@ def export_social_media_networks_table(output_directory: Path):
 
 
 # Load in config.json
-database_config = load_database_config()
-settings_config = load_settings()
+database_config: dict[str, Any] = load_database_config()
+settings_config: dict[str, Any] = load_settings()
 
 # Parse command arguments and set the output directory
-parsed_arguments = parse_arguments()
-output_directory = parse_output_directory(parsed_arguments)
+parsed_arguments: dict[str, Any] = parse_arguments()
+output_directory: Path = parse_output_directory(parsed_arguments)
 
 # Create the output directory
 create_output_directory(output_directory=output_directory)

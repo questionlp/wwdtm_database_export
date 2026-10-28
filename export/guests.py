@@ -40,7 +40,7 @@ class Guests:
 
             self.database_connection = database_connection
 
-    def to_json(self) -> str:
+    def to_json(self) -> str | None:
         """Returns database contents of ww_guests as JSON.
 
         :return: Contents of the ww_guests table as JSON

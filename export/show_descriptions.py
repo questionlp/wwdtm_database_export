@@ -40,7 +40,7 @@ class ShowDescriptions:
 
             self.database_connection = database_connection
 
-    def to_json(self) -> str:
+    def to_json(self) -> str | None:
         """Returns database contents of ww_showdescriptions as JSON.
 
         :return: Contents of the ww_showdescriptions table as JSON

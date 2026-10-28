@@ -40,7 +40,7 @@ class PostalAbbreviations:
 
             self.database_connection = database_connection
 
-    def to_json(self) -> str:
+    def to_json(self) -> str | None:
         """Returns database contents of ww_postal_abbreviations as JSON.
 
         :return: Contents of the ww_postal_abbreviations table as JSON

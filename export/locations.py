@@ -40,7 +40,7 @@ class Locations:
 
             self.database_connection = database_connection
 
-    def to_json(self, convert_decimal_to_string: bool = True) -> str:
+    def to_json(self, convert_decimal_to_string: bool = True) -> str | None:
         """Returns database contents of ww_locations as JSON.
 
         :return: Contents of the ww_locations table as JSON

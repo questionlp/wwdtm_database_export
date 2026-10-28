@@ -40,14 +40,14 @@ class ExternalSites:
 
             self.database_connection = database_connection
 
-    def to_json(self) -> str:
+    def to_json(self) -> str | None:
         """Returns database contents of ww_pronouns as JSON.
 
         :return: Contents of the ww_pronouns table as JSON
         """
         cursor = self.database_connection.cursor(dictionary=True)
         query = """
-            SELECT siteid, site, siteslug, iconname
+            SELECT siteid, site, siteslug, iconname, socialmedia
             FROM ww_externalsites
             ORDER BY siteid ASC;
             """
@@ -56,4 +56,15 @@ class ExternalSites:
         cursor.close()
 
         if results:
-            return json.dumps(results, indent=4, sort_keys=False)
+            info = []
+            for row in results:
+                info.append(
+                    {
+                        "siteid": row["siteid"],
+                        "site": row["site"],
+                        "siteslug": row["siteslug"],
+                        "iconname": row["iconname"],
+                        "socialmedia": bool(row["socialmedia"]),
+                    }
+                )
+            return json.dumps(info, indent=4, sort_keys=False)

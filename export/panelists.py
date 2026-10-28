@@ -40,7 +40,7 @@ class Panelists:
 
             self.database_connection = database_connection
 
-    def to_json(self) -> str:
+    def to_json(self) -> str | None:
         """Returns database contents of ww_panelists as JSON.
 
         :return: Contents of the ww_panelists table as JSON
@@ -59,7 +59,7 @@ class Panelists:
         if results:
             return json.dumps(results, indent=4, sort_keys=False)
 
-    def external_sites_map_to_json(self) -> str:
+    def external_sites_map_to_json(self) -> str | None:
         """Returns database contents of ww_panelistextsitesmap as JSON.
 
         :return: Contents of ww_panelistextsitesmap as JSON
@@ -77,7 +77,7 @@ class Panelists:
         if results:
             return json.dumps(results, indent=4, sort_keys=False)
 
-    def pronouns_map_to_json(self) -> str:
+    def pronouns_map_to_json(self) -> str | None:
         """Returns database contents of ww_panelistpronounsmap as JSON.
 
         :return: Contents of ww_panelistpronounsmap as JSON
